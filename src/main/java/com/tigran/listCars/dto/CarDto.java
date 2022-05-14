@@ -11,11 +11,13 @@ public class CarDto {
     private int year;
     private double price;
     private String link;
+    private String currency;
 
     public CarDto(Car car) {
         this.brand = car.getBrand();
         this.year = car.getYear();
         this.price = car.getPrice();
-        this.link=car.getLink();
+        this.link = car.getLink();
+        this.currency = car.getCurrency();
     }
 }

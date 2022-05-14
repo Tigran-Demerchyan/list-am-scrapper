@@ -23,11 +23,14 @@ public class Car {
     private double price;
     @Column(name = "link")
     private String link;
+    @Column(name = "currency")
+    private String currency;
 
     public Car(CarDto dto) {
         this.brand = dto.getBrand();
         this.year = dto.getYear();
         this.price = dto.getPrice();
         this.link=dto.getLink();
+        this.currency=dto.getCurrency();
     }
 }

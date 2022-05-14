@@ -1,6 +1,5 @@
 package com.tigran.listCars.scrapper;
 
-import antlr.StringUtils;
 import com.tigran.listCars.dto.CarDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -24,13 +23,23 @@ public class CarScrapper {
 
         List<CarDto> collect = allRows.stream()
                 .map(c -> convert(c))
-                .filter(c -> c.getPrice() > LIMIT_PRICE)
+                .filter(c -> {
+                    if (c.getCurrency().equals("$")) {
+                        return c.getPrice() > LIMIT_PRICE;
+
+                    } else if (c.getCurrency().equals("֏")) {
+                        return c.getPrice() / 480 > LIMIT_PRICE;
+                    }
+
+                    return false;
+                })
                 .collect(Collectors.toList());
 
         return collect;
 
 
     }
+
 
     private CarDto convert(Element curr) {
         CarDto dto = new CarDto();
@@ -39,16 +48,26 @@ public class CarScrapper {
         dto.setLink(href);
 
         String priceText = curr.select(".p").text();
+
+        if (priceText.contains("$")) {
+            dto.setCurrency("$");
+        } else {
+            dto.setCurrency("֏");
+        }
+
+
         priceText = priceText.replaceAll("\\$", "");
         priceText = priceText.replaceAll(",", "");
         priceText = priceText.replaceAll("֏", "");
         Pattern pattern = Pattern.compile("\\d+");
         Matcher matcher = pattern.matcher(priceText);
+
         if (matcher.find()) {
             String group = matcher.group();
             double price = Double.parseDouble(group);
             dto.setPrice(price);
         }
+
         String brandText = curr.select(".l").text();
         Pattern pattern1 = Pattern.compile("[a-zA-Z]+\\s?[a-zA-Z].");
         Matcher matcher1 = pattern1.matcher(brandText);
